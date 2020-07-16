@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import '../styles/index.scss';
-import { Mercury, Neptune, Venus, Earth, Mars, Jupiter, Saturn, Uranus } from '../constants';
+import { Mercury, Neptune, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Sun } from '../constants';
 
 const BASE_PERIOD   = 10;
 
@@ -11,21 +11,33 @@ const MAX_DISTANCE  = 52.5;
 const BASE_RADIUS   = 0.5;
 const MAX_RADIUS    = 1.25;
 
+const ORBIT_UNIT    = 'px'; 
+const OBJECT_UNIT   = 'rem'; 
+const SUN_UNIT      = 'px'; 
+const WIDTH         = 200;
+
 export class SolarSystem extends React.Component {
 
     getOrbitSize(distance: number): number {
-        return Math.sqrt(distance / Neptune.DistanceFromSun) * MAX_DISTANCE + BASE_DISTANCE;
+        let squareRatio = Math.sqrt(distance / Neptune.DistanceFromSun);
+        // return Math.sqrt(distance / Neptune.DistanceFromSun) * MAX_DISTANCE + BASE_DISTANCE;
+        return WIDTH * squareRatio;
     }
 
     getObjectSize(radius: number): number {
         return (radius / Jupiter.Radius) * MAX_RADIUS + BASE_RADIUS;
     }
 
+    getSunSize(): number {
+        let mercuryOrbitSize = this.getOrbitSize(Mercury.DistanceFromSun);
+        return (mercuryOrbitSize / 2);
+    }
+
     getOrbitStyles(lengthOfYear: number, distance: number, zIndex: number) {
         return {
             animationDuration: `${BASE_PERIOD * lengthOfYear}s`,
-            height: `${this.getOrbitSize(distance)}rem`,
-            width: `${this.getOrbitSize(distance)}rem`,
+            height: `${this.getOrbitSize(distance)}${ORBIT_UNIT}`,
+            width: `${this.getOrbitSize(distance)}${ORBIT_UNIT}`,
             zIndex
         };
     }
@@ -34,8 +46,18 @@ export class SolarSystem extends React.Component {
         return styled.div`
             &::before {
                 background-color: #000;
-                width: ${this.getObjectSize(radius)}rem;
-                height: ${this.getObjectSize(radius)}rem;
+                width: ${this.getObjectSize(radius)}${OBJECT_UNIT};
+                height: ${this.getObjectSize(radius)}${OBJECT_UNIT};
+            }
+        `;
+    }
+
+    getSunStyles(): any {
+        return styled.div`
+            &::before {
+                background-color: orange;
+                width: ${this.getSunSize()}${SUN_UNIT};
+                height: ${this.getSunSize()}${SUN_UNIT};
             }
         `;
     }
@@ -50,10 +72,12 @@ export class SolarSystem extends React.Component {
         const UranusPlanet      = this.getObjectStyles(Uranus.Radius);
         const NeptunePlanet     = this.getObjectStyles(Neptune.Radius);
 
+        const SunObject = this.getSunStyles();
+
         return (
             <div className="solar-system">
                 <div className='orbit sun'>
-                    <div className='object' />
+                    <SunObject className='object' />
                 </div>
 
                 <div className='orbit mercury' style={this.getOrbitStyles(Mercury.LengthOfYear, Mercury.DistanceFromSun, 90)}>
