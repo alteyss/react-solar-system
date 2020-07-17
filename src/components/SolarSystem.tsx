@@ -1,10 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import '../styles/index.scss';
-import { Mercury, Neptune, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Sun } from '../constants';
+import { Mercury, Neptune, Venus, Earth, Mars, Jupiter, Saturn, Uranus } from '../constants';
 
 const BASE_PERIOD   = 10;
-const MAX_SIZE      = 50;
+
+const BASE_DISTANCE = 5;
+const MAX_DISTANCE  = 50;
 
 const BASE_RADIUS   = 0.3;
 const MAX_RADIUS    = 1.3;
@@ -20,8 +22,13 @@ export class SolarSystem extends React.Component {
     };
 
     getOrbitSize(distance: number): number {
-        let squareRatio = Math.sqrt(distance / Neptune.DistanceFromSun);
-        return squareRatio * MAX_SIZE;
+        let ratio   = Math.sqrt(distance / Neptune.DistanceFromSun);
+        let size    = ratio * MAX_DISTANCE + BASE_DISTANCE;
+
+        // if (size > MAX_DISTANCE)
+        //     size = MAX_DISTANCE;
+
+        return size;
     }
 
     getObjectSize(radius: number): number {
@@ -77,7 +84,7 @@ export class SolarSystem extends React.Component {
 
         return (
             <div className="solar-system" style={{
-                fontSize: (2 * this.state.width) / 100 // 2% of the width
+                fontSize: (2 * this.state.width) / 100 // 2% of the width => adds 10/100 of the width
             }}>
                 <div className="commands">
                     <input type="number" value={this.state.width} onInput={(val: any) => {
