@@ -5,7 +5,7 @@ import { Mercury, Neptune, Venus, Earth, Mars, Jupiter, Saturn, Uranus } from '.
 
 const BASE_PERIOD   = 10;
 
-const BASE_DISTANCE = 5;
+// const BASE_DISTANCE = 5;
 const MAX_DISTANCE  = 50;
 
 const BASE_RADIUS   = 0.3;
@@ -18,27 +18,23 @@ const SUN_UNIT      = 'em';
 export class SolarSystem extends React.Component {
 
     state = {
-        width: 600
+        width: 900,
+        colored: true
     };
 
     getOrbitSize(distance: number): number {
-        let ratio   = Math.sqrt(distance / Neptune.DistanceFromSun);
-        let size    = ratio * MAX_DISTANCE + BASE_DISTANCE;
-
-        // if (size > MAX_DISTANCE)
-        //     size = MAX_DISTANCE;
-
-        return size;
+        let ratio = Math.sqrt(distance / Neptune.DistanceFromSun);
+        return ratio * MAX_DISTANCE;
     }
 
     getObjectSize(radius: number): number {
-        let squareRatio = radius / Jupiter.Radius;
-        return squareRatio * MAX_RADIUS + BASE_RADIUS;
+        let ratio = radius / Jupiter.Radius;
+        return ratio * MAX_RADIUS + BASE_RADIUS;
     }
 
     getSunSize(): number {
         let mercuryOrbitSize = this.getOrbitSize(Mercury.DistanceFromSun);
-        return mercuryOrbitSize / 1.7;
+        return mercuryOrbitSize / 1.5;
     }
 
     getOrbitStyles(lengthOfYear: number, distance: number, elevation: number) {
@@ -53,7 +49,7 @@ export class SolarSystem extends React.Component {
     getObjectStyles(radius: number): any {
         return styled.div`
             &::before {
-                background-color: #000;
+                background-color: ${(props: any) => props.colored ? '#6B93D6' : '#000'};
                 width: ${this.getObjectSize(radius)}${OBJECT_UNIT};
                 height: ${this.getObjectSize(radius)}${OBJECT_UNIT};
             }
@@ -84,14 +80,10 @@ export class SolarSystem extends React.Component {
 
         return (
             <div className="solar-system" style={{
-                fontSize: (2 * this.state.width) / 100 // 2% of the width => adds 10/100 of the width
+                fontSize: this.state.width / MAX_DISTANCE,
+                width: this.state.width,
+                height: this.state.width
             }}>
-                <div className="commands">
-                    <input type="number" value={this.state.width} onInput={(val: any) => {
-                        this.setState({ width: val.target.value });
-                    }} />
-                </div>
-
                 <div className='orbit sun'>
                     <SunObject className='object' />
                 </div>
@@ -105,7 +97,7 @@ export class SolarSystem extends React.Component {
                 </div>
 
                 <div className='orbit earth' style={this.getOrbitStyles(Earth.LengthOfYear, Earth.DistanceFromSun, 70)}>
-                    <EarthPlanet className='object' />
+                    <EarthPlanet className='object' colored={this.state.colored} />
                 </div>
 
                 <div className='orbit mars' style={this.getOrbitStyles(Mars.LengthOfYear, Mars.DistanceFromSun, 60)}>
@@ -124,8 +116,14 @@ export class SolarSystem extends React.Component {
                     <UranusPlanet className='object' />     
                 </div>
 
-                <div className='orbit neptune' style={this.getOrbitStyles(Neptune.LengthOfYear, Neptune.DistanceFromSun, 20)}>
+                <div className='orbit neptune bg' style={this.getOrbitStyles(Neptune.LengthOfYear, Neptune.DistanceFromSun, 20)}>
                     <NeptunePlanet className='object' />
+                </div>
+
+                <div className="commands">
+                    <input type="number" value={this.state.width} onInput={(val: any) => {
+                        this.setState({ width: val.target.value });
+                    }} />
                 </div>
             </div>
         );
