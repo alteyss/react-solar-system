@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import '../styles/index.scss';
-import { Mercury, Neptune, Venus, Earth, Mars, Jupiter, Saturn, Uranus } from '../constants';
+import { Mercury, Neptune, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Moon } from '../constants';
 
 const BASE_PERIOD   = 10;
 
@@ -13,13 +13,13 @@ const MAX_RADIUS    = 1.3;
 
 const ORBIT_UNIT    = 'em'; 
 const OBJECT_UNIT   = 'em'; 
-const SUN_UNIT      = 'em'; 
 
 export class SolarSystem extends React.Component {
 
     state = {
         width: 900,
-        colored: true
+        colored: true,
+        interactive: true
     };
 
     getOrbitSize(distance: number): number {
@@ -37,11 +37,11 @@ export class SolarSystem extends React.Component {
         return mercuryOrbitSize / 1.5;
     }
 
-    getOrbitStyles(lengthOfYear: number, distance: number, elevation: number) {
+    getOrbitStyles(lengthOfYear: number, distance: number, elevation: number, fixedSize?: number) {
         return {
             animationDuration: `${BASE_PERIOD * lengthOfYear}s`,
-            height: `${this.getOrbitSize(distance)}${ORBIT_UNIT}`,
-            width: `${this.getOrbitSize(distance)}${ORBIT_UNIT}`,
+            height: `${fixedSize ? fixedSize : this.getOrbitSize(distance)}${ORBIT_UNIT}`,
+            width: `${fixedSize ? fixedSize : this.getOrbitSize(distance)}${ORBIT_UNIT}`,
             zIndex: elevation
         };
     }
@@ -60,8 +60,18 @@ export class SolarSystem extends React.Component {
         return styled.div`
             &::before {
                 background-color: orange;
-                width: ${this.getSunSize()}${SUN_UNIT};
-                height: ${this.getSunSize()}${SUN_UNIT};
+                width: ${this.getSunSize()}${OBJECT_UNIT};
+                height: ${this.getSunSize()}${OBJECT_UNIT};
+            }
+        `;
+    }
+
+    getMoonStyles(): any {
+        return styled.div`
+            &::before {
+                background-color: #ddd;
+                width: ${0.1}${OBJECT_UNIT};
+                height: ${0.1 }${OBJECT_UNIT};
             }
         `;
     }
@@ -76,10 +86,11 @@ export class SolarSystem extends React.Component {
         const UranusPlanet      = this.getObjectStyles(Uranus.Radius);
         const NeptunePlanet     = this.getObjectStyles(Neptune.Radius);
 
-        const SunObject = this.getSunStyles();
+        const SunObject     = this.getSunStyles();
+        const MoonObject    = this.getMoonStyles();
 
         return (
-            <div className="solar-system" style={{
+            <div className={`solar-system ${this.state.interactive ? 'interactive' : ''}`} style={{
                 fontSize: this.state.width / MAX_DISTANCE,
                 width: this.state.width,
                 height: this.state.width
@@ -97,7 +108,11 @@ export class SolarSystem extends React.Component {
                 </div>
 
                 <div className='orbit earth' style={this.getOrbitStyles(Earth.LengthOfYear, Earth.DistanceFromSun, 70)}>
-                    <EarthPlanet className='object' colored={this.state.colored} />
+                    <EarthPlanet className='object' colored={this.state.colored}>
+                        <div className="orbit moon" style={this.getOrbitStyles(Moon.LengthOfYear, Moon.DistanceFromEarth, 65, 1)}>
+                            <MoonObject className='object' />
+                        </div>
+                    </EarthPlanet>
                 </div>
 
                 <div className='orbit mars' style={this.getOrbitStyles(Mars.LengthOfYear, Mars.DistanceFromSun, 60)}>
@@ -118,12 +133,6 @@ export class SolarSystem extends React.Component {
 
                 <div className='orbit neptune bg' style={this.getOrbitStyles(Neptune.LengthOfYear, Neptune.DistanceFromSun, 20)}>
                     <NeptunePlanet className='object' />
-                </div>
-
-                <div className="commands">
-                    <input type="number" value={this.state.width} onInput={(val: any) => {
-                        this.setState({ width: val.target.value });
-                    }} />
                 </div>
             </div>
         );
